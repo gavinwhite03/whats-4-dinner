@@ -110,6 +110,10 @@ def patch_grocery(db: Session, item_id: int, item_data):
     return existing_item
 
 # Recipes Crud
+
+def get_recipe(item_id: int, db: Session):
+    return db.query(models.Recipe).filter(models.Recipe.id == item_id).first()
+
 def create_recipe(db: Session, recipe_data):
     db_recipe = models.Recipe(
         title=recipe_data.title,
@@ -123,7 +127,7 @@ def create_recipe(db: Session, recipe_data):
     return db_recipe
 
 def get_recipes(db: Session, title=None, ingredient=None, category=None):
-    query = db.query(models.GroceryItem)
+    query = db.query(models.Recipe)
 
     if title:
         query = query.filter(models.Recipe.title.ilike(f"%{title}%"))
@@ -132,6 +136,31 @@ def get_recipes(db: Session, title=None, ingredient=None, category=None):
         query = query.filter(models.Recipe.ingredients.ilike(f"%{ingredient}%"))
         
     if category is not None:
-        query = query.filter(models.GroceryItem.category == category)
+        query = query.filter(models.Recipe.category == category)
 
     return query.all()
+
+def patch_recipe(db: Session, item_id: int, item_data):
+    existing_item = db.query(models.Recipe).filter(models.Recipe.id == item_id).first()
+
+    if not existing_item:
+        return None
+
+    if item_data.title is not None:
+        existing_item.title = item_data.title
+    if item_data.ingredients is not None:
+        existing_item.ingredients = item_data.ingredients
+    if item_data.category is not None:
+        existing_item.category = item_data.category
+
+    db.commit()
+    db.refresh(existing_item)
+    return existing_item
+
+def delete_recipe(item_id: int, db: Session):
+    item = get_recipe(item_id=item_id, db=db)
+    if item is None:
+        raise HTTPException(status_code=404, detail="Item not found")
+    db.delete(item)
+    db.commit()
+    return {"detail": "Item deleted"}

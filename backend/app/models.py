@@ -1,19 +1,36 @@
-from sqlalchemy import Column, Integer, String, Boolean, Text
+from sqlalchemy import Column, Integer, String, Boolean, Text, Table, ForeignKey
+from sqlalchemy.orm import relationship
+
 from .groceries_db import Base
 from pydantic import BaseModel
 from typing import Optional
 
+# Many-to-many association table
+recipe_ingredients_table = Table(
+    "recipe_ingredients",
+    Base.metadata,
+    Column("recipe_id", Integer, ForeignKey("recipes.id"), primary_key=True),
+    Column("grocery_item_id", Integer, ForeignKey("grocery_items.id"), primary_key=True),
+    Column("quantity", Integer, default=1),
+    Column("unit", String, default="")
+)
+    
 class GroceryItem(Base):
     __tablename__ = "grocery_items"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
-    unit = Column(String, index=True)
-    category = Column(String, default='general')
+    name = Column(String, nullable=False)
     quantity = Column(Integer, default=1)
-    have = Column(Boolean, default=True)  # True if in inventory
-    need = Column(Boolean, default=False) # True if on shopping list
-    
+    unit = Column(String, default="")
+    have = Column(Boolean, default=True)
+    need = Column(Boolean, default=False)
+    category = Column(String, default="general")
+
+    recipes = relationship(
+        "Recipe",
+        secondary=recipe_ingredients_table,
+        back_populates="ingredients"
+    )
 class GroceryItemCreate(BaseModel):
     name: str
     quantity: int = 1
@@ -53,14 +70,20 @@ class GroceryItemUpdate(BaseModel):
         from_attributes = True
         
 # Recipes Database
+
 class Recipe(Base):
     __tablename__ = "recipes"
 
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, nullable=False)
     instructions = Column(Text)
-    ingredients = Column(Text)
     category = Column(String, default="general")
+
+    ingredients = relationship(
+        "GroceryItem",
+        secondary=recipe_ingredients_table,
+        back_populates="recipes"
+    )
     
 class RecipeCreate(BaseModel):
     title: str

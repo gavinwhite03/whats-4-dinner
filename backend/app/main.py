@@ -78,3 +78,17 @@ def list_recipes(
     ingredient: Optional[str] = Query(None),
     category: Optional[str] = Query(None)):
     return crud.get_recipes(db, title=title, ingredient=ingredient, category=category)
+
+@app.patch("/recipes/{item_id}", response_model=RecipeResponse)
+def patch_recipe(item_id: int, item: RecipeCreate, db: Session = Depends(get_db)):
+    updated_item = crud.patch_recipe(db, item_id, item)
+    if not updated_item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return updated_item
+
+@app.delete("/recipes/{item_id}")
+def delete_recipe(item_id: int, db: Session = Depends(get_db)):
+    success = crud.delete_recipe(item_id, db)
+    if not success:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return {"detail": "Item deleted"}
