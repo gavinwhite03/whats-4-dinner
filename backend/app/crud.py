@@ -7,7 +7,7 @@ from .models import GroceryItem, GroceryItemCreate, PantryItemCreate
 def read_root():
     return {"message": "Grocery API running"}
 
-def get_groceries(db: Session, name=None, need=None, have=None):
+def get_groceries(db: Session, name=None, need=None, have=None, category=None):
     query = db.query(models.GroceryItem)
 
     if name:
@@ -18,6 +18,9 @@ def get_groceries(db: Session, name=None, need=None, have=None):
 
     if have is not None:
         query = query.filter(models.GroceryItem.have == have)
+        
+    if category is not None:
+        query = query.filter(models.GroceryItem.category == category)
 
     return query.all()
 
@@ -27,11 +30,15 @@ def get_item(item_id: int, db: Session):
 def get_needs(db: Session, need: str):
     return db.query(models.GroceryItem).filter(models.GroceryItem.need == need).all()
 
+def get_have(db: Session, have: str):
+    return db.query(models.GroceryItem).filter(models.GroceryItem.have == have).all()
+
 def create_grocery(item: GroceryItemCreate, db: Session):
     db_item = GroceryItem(
         name=item.name,
         quantity=item.quantity,
         unit=item.unit,
+        category=item.category,
         have=False,
         need=True
     )
@@ -45,9 +52,14 @@ def create_pantry(item: PantryItemCreate, db: Session):
         name=item.name,
         quantity=item.quantity,
         unit=item.unit,
+        category=item.category,
         have=True,
         need=False
     )
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
 
 def update_grocery(db: Session, item_id: int, item_data):
     existing_item = db.query(models.GroceryItem).filter(models.GroceryItem.id == item_id).first()
@@ -58,6 +70,7 @@ def update_grocery(db: Session, item_id: int, item_data):
     existing_item.name = item_data.name
     existing_item.quantity = item_data.quantity
     existing_item.unit = item_data.unit
+    existing_item.category = item_data.category
     existing_item.have = item_data.have
     existing_item.need = item_data.need
 
@@ -85,6 +98,8 @@ def patch_grocery(db: Session, item_id: int, item_data):
         existing_item.quantity = item_data.quantity
     if item_data.unit is not None:
         existing_item.unit = item_data.unit
+    if item_data.category is not None:
+        existing_item.category = item_data.category
     if item_data.have is not None:
         existing_item.have = item_data.have
     if item_data.need is not None:

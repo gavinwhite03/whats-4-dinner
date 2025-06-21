@@ -9,6 +9,7 @@ class GroceryItem(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, index=True)
     unit = Column(String, index=True)
+    category = Column(String, default='general')
     quantity = Column(Integer, default=1)
     have = Column(Boolean, default=True)  # True if in inventory
     need = Column(Boolean, default=False) # True if on shopping list
@@ -17,6 +18,7 @@ class GroceryItemCreate(BaseModel):
     name: str
     quantity: int = 1
     unit: str
+    category: str = 'general'
     have: bool = False
     need: bool = True
 
@@ -24,12 +26,15 @@ class PantryItemCreate(BaseModel):
     name: str
     quantity: int = 1
     unit: str
+    category: str = 'general'
     have: bool = True
     need: bool = False
 class GroceryItemResponse(BaseModel):
     id: int
     name: str
     quantity: int
+    unit: str
+    category: str = 'general'
     have: bool
     need: bool
 
@@ -40,6 +45,7 @@ class GroceryItemUpdate(BaseModel):
     name: Optional[str] = None
     quantity: Optional[int] = None
     unit: Optional[str] = None
+    category: Optional[str] = 'general'
     have: Optional[bool] = None
     need: Optional[bool] = None
 

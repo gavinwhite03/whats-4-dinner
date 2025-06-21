@@ -24,13 +24,14 @@ def get_groceries(
     db: Session = Depends(get_db),
     name: Optional[str] = Query(None),
     need: Optional[bool] = Query(None),
-    have: Optional[bool] = Query(None)
+    have: Optional[bool] = Query(None),
+    category: Optional[str] = Query(None)
 ):
-    return crud.get_groceries(db, name=name, need=need, have=have)
+    return crud.get_groceries(db, name=name, need=need, have=have, category=category)
 
 @app.get("/items/inventory")
-def get_needs(db: Session = Depends(get_db)):
-    return crud.get_needs(db, True)
+def get_have(db: Session = Depends(get_db)):
+    return crud.get_have(db, True)
 
 @app.get("/items/shopping")
 def get_needs(db: Session = Depends(get_db)):
