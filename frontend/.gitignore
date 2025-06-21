@@ -22,3 +22,21 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+# VSCode
+.vscode/
+
+# Virtual env
+venv/
+.env/
+
+# OS
+.DS_Store
+Thumbs.db
