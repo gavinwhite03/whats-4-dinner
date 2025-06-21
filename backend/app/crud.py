@@ -2,13 +2,24 @@ from sqlalchemy.orm import Session
 from . import models
 from fastapi import FastAPI, Depends, HTTPException
 from . import models, database
-from .models import GroceryItem, GroceryItemCreate
+from .models import GroceryItem, GroceryItemCreate, PantryItemCreate
 
 def read_root():
     return {"message": "Grocery API running"}
 
-def get_groceries(db: Session):
-    return db.query(models.GroceryItem).all()
+def get_groceries(db: Session, name=None, need=None, have=None):
+    query = db.query(models.GroceryItem)
+
+    if name:
+        query = query.filter(models.GroceryItem.name.ilike(f"%{name}%"))
+
+    if need is not None:
+        query = query.filter(models.GroceryItem.need == need)
+
+    if have is not None:
+        query = query.filter(models.GroceryItem.have == have)
+
+    return query.all()
 
 def get_item(item_id: int, db: Session):
     return db.query(models.GroceryItem).filter(models.GroceryItem.id == item_id).first()
@@ -21,13 +32,22 @@ def create_grocery(item: GroceryItemCreate, db: Session):
         name=item.name,
         quantity=item.quantity,
         unit=item.unit,
-        have=item.have,
-        need=item.need
+        have=False,
+        need=True
     )
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
     return db_item
+
+def create_pantry(item: PantryItemCreate, db: Session):
+    db_item = GroceryItem(
+        name=item.name,
+        quantity=item.quantity,
+        unit=item.unit,
+        have=True,
+        need=False
+    )
 
 def update_grocery(db: Session, item_id: int, item_data):
     existing_item = db.query(models.GroceryItem).filter(models.GroceryItem.id == item_id).first()

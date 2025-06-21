@@ -12,13 +12,20 @@ class GroceryItem(Base):
     quantity = Column(Integer, default=1)
     have = Column(Boolean, default=True)  # True if in inventory
     need = Column(Boolean, default=False) # True if on shopping list
+    
 class GroceryItemCreate(BaseModel):
+    name: str
+    quantity: int = 1
+    unit: str
+    have: bool = False
+    need: bool = True
+
+class PantryItemCreate(BaseModel):
     name: str
     quantity: int = 1
     unit: str
     have: bool = True
     need: bool = False
-
 class GroceryItemResponse(BaseModel):
     id: int
     name: str
