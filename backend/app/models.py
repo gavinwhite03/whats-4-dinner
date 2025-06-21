@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean
-from .database import Base
+from sqlalchemy import Column, Integer, String, Boolean, Text
+from .groceries_db import Base
 from pydantic import BaseModel
 from typing import Optional
 
@@ -48,6 +48,28 @@ class GroceryItemUpdate(BaseModel):
     category: Optional[str] = 'general'
     have: Optional[bool] = None
     need: Optional[bool] = None
+
+    class Config:
+        from_attributes = True
+        
+# Recipes Database
+class Recipe(Base):
+    __tablename__ = "recipes"
+
+    id = Column(Integer, primary_key=True, index=True)
+    title = Column(String, nullable=False)
+    instructions = Column(Text)
+    ingredients = Column(Text)
+    category = Column(String, default="general")
+    
+class RecipeCreate(BaseModel):
+    title: str
+    instructions: str
+    ingredients: str
+    category: str = "general"
+
+class RecipeResponse(RecipeCreate):
+    id: int
 
     class Config:
         from_attributes = True

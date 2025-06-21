@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
-from . import models
+from . import groceries_db, models
 from fastapi import FastAPI, Depends, HTTPException
-from . import models, database
+from . import models
 from .models import GroceryItem, GroceryItemCreate, PantryItemCreate
 
 def read_root():
@@ -108,3 +108,30 @@ def patch_grocery(db: Session, item_id: int, item_data):
     db.commit()
     db.refresh(existing_item)
     return existing_item
+
+# Recipes Crud
+def create_recipe(db: Session, recipe_data):
+    db_recipe = models.Recipe(
+        title=recipe_data.title,
+        instructions=recipe_data.instructions,
+        ingredients=recipe_data.ingredients,
+        category=recipe_data.category
+    )
+    db.add(db_recipe)
+    db.commit()
+    db.refresh(db_recipe)
+    return db_recipe
+
+def get_recipes(db: Session, title=None, ingredient=None, category=None):
+    query = db.query(models.GroceryItem)
+
+    if title:
+        query = query.filter(models.Recipe.title.ilike(f"%{title}%"))
+
+    if ingredient is not None:
+        query = query.filter(models.Recipe.ingredients.ilike(f"%{ingredient}%"))
+        
+    if category is not None:
+        query = query.filter(models.GroceryItem.category == category)
+
+    return query.all()

@@ -1,17 +1,17 @@
 from fastapi import FastAPI, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from . import models, database, crud
-from .models import GroceryItem, GroceryItemCreate, GroceryItemResponse, GroceryItemUpdate, PantryItemCreate
+from . import groceries_db, models, crud
+from .models import GroceryItem, GroceryItemCreate, GroceryItemResponse, GroceryItemUpdate, PantryItemCreate, RecipeCreate, RecipeResponse, Recipe
 from typing import List, Optional
 
 
-models.Base.metadata.create_all(bind=database.engine)
+models.Base.metadata.create_all(bind=groceries_db.engine)
 
 app = FastAPI()
 
 # Dependency - get DB session
 def get_db():
-    db = database.SessionLocal()
+    db = groceries_db.SessionLocal()
     try:
         yield db
     finally:
@@ -65,3 +65,16 @@ def patch_grocery(item_id: int, item: GroceryItemUpdate, db: Session = Depends(g
     if not updated_item:
         raise HTTPException(status_code=404, detail="Item not found")
     return updated_item
+
+# Recipe Routes
+@app.post("/recipes", response_model=RecipeResponse)
+def add_recipe(recipe: RecipeCreate, db: Session = Depends(get_db)):
+    return crud.create_recipe(db, recipe)
+
+@app.get("/recipes", response_model=List[RecipeResponse])
+def list_recipes(
+    db: Session = Depends(get_db),
+    title: Optional[str] = Query(None),
+    ingredient: Optional[str] = Query(None),
+    category: Optional[str] = Query(None)):
+    return crud.get_recipes(db, title=title, ingredient=ingredient, category=category)
