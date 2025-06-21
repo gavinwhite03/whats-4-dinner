@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException
 from sqlalchemy.orm import Session
-from . import models, database
-from .models import GroceryItem, GroceryItemCreate
+from . import models, database, crud
+from .models import GroceryItem, GroceryItemCreate, GroceryItemResponse, GroceryItemUpdate
 
 models.Base.metadata.create_all(bind=database.engine)
 
@@ -17,35 +17,39 @@ def get_db():
 
 # Routes
 
-@app.get("/")
-def read_root():
-    return {"message": "Grocery API running"}
-
 @app.get("/groceries")
 def get_groceries(db: Session = Depends(get_db)):
-    return db.query(models.GroceryItem).all()
+    return crud.get_groceries(db)
 
+@app.get("/groceries/true")
+def get_needs(db: Session = Depends(get_db)):
+    return crud.get_needs(db, True)
+
+@app.get("/groceries/false")
+def get_needs(db: Session = Depends(get_db)):
+    return crud.get_needs(db, False)
+
+@app.put("/groceries/{item_id}", response_model=GroceryItemResponse)
+def update_grocery(item_id: int, item: GroceryItemCreate, db: Session = Depends(get_db)):
+    updated_item = crud.update_grocery(db, item_id, item)
+    if not updated_item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return updated_item
+    
 @app.post("/groceries")
 def add_grocery(item: GroceryItemCreate, db: Session = Depends(get_db)):
-    db_item = GroceryItem(
-        name=item.name,
-        quantity=item.quantity,
-        unit=item.unit,
-        have=item.have,
-        need=item.need
-    )
-    db.add(db_item)
-    db.commit()
-    db.refresh(db_item)
-    return db_item
-
-
+    return crud.create_grocery(item, db)
 
 @app.delete("/groceries/{item_id}")
 def delete_grocery(item_id: int, db: Session = Depends(get_db)):
-    item = db.query(models.GroceryItem).filter(models.GroceryItem.id == item_id).first()
-    if item is None:
+    success = crud.delete_grocery(db, item_id)
+    if not success:
         raise HTTPException(status_code=404, detail="Item not found")
-    db.delete(item)
-    db.commit()
     return {"detail": "Item deleted"}
+
+@app.patch("/groceries/{item_id}", response_model=GroceryItemResponse)
+def patch_grocery(item_id: int, item: GroceryItemUpdate, db: Session = Depends(get_db)):
+    updated_item = crud.patch_grocery(db, item_id, item)
+    if not updated_item:
+        raise HTTPException(status_code=404, detail="Item not found")
+    return updated_item
