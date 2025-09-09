@@ -1,0 +1,48 @@
+.home {
+  text-align: center;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Intro Section */
+.intro {
+  margin: 2rem 0;
+  color: black;
+}
+.intro h2 {
+  font-size: 1.8rem;
+  margin-bottom: 0.5rem;
+}
+.intro p {
+  font-size: 1.2rem;
+  color: #666;
+}
+
+/* Action Section */
+.actions {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  margin: 3rem 0;
+}
+
+.card {
+  color: black;
+  font-size: 30px;
+  background-color: #ddd;
+  padding: 3rem;
+  border-radius: 12px;
+  box-shadow: 4px 6px #bbb;
+  width: 250px;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  text-decoration: none;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 6px 8px #aaa;
+}
