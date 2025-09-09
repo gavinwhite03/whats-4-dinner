@@ -40,3 +40,10 @@
 .read-the-docs {
   color: #888;
 }
+
+.navbar-nav .nav-item .nav-link:link{
+  color: black
+}
+.navbar-nav .nav-item .nav-link:hover {
+  color: blue; 
+}
