@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import Logo from "C:/whats-4-dinner/whats-4-dinner/frontend/src/assets/What's_4_Dinner_Logo.png";
-import "./Navbar.css"; // import the styles
+import "./Navbar.css";
 
 function Navbar() {
   return (

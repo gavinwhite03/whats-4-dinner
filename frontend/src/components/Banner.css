@@ -1,0 +1,27 @@
+.banner {
+  position: relative;
+  margin-top: -350px;
+  width: 100vw;
+  height: 400px;
+  overflow: hidden;
+}
+
+.banner-img {
+  width: 150%;
+  height: auto;
+  object-fit: fill;
+  display: block;
+  opacity: 70%;
+}
+
+.banner-text {
+  position: absolute;
+  top: 50%;   
+  left: 50%;      
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: black;
+  font-size: 1rem;
+  font-weight: bold;
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.6);
+}
