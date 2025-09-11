@@ -3,8 +3,9 @@ import Home from "./pages/Home";
 import Recipes from "./pages/Recipes";
 import Pantry from "./pages/Pantry";
 import RecipeDetail from "./pages/RecipeDetails";
-import Navbar from "./components/navbar";
+import Navbar from "./components/Navbar";
 import Banner from "./components/Banner"
+import Footer from "./components/Footer";
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
         <Route path="/pantry" element={<Pantry />} />
         <Route path="/recipes/:id" element={<RecipeDetail />} />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }
