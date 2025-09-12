@@ -16,9 +16,6 @@ type FilterOptions = {
   lowCalorie: boolean;
   highCarb: boolean;
   lowCarb: boolean;
-  vegan: boolean;
-  glutenFree: boolean;
-  keto: boolean;
 };
 
 function Recipes() {
@@ -32,9 +29,6 @@ function Recipes() {
     lowCalorie: false,
     highCarb: false,
     lowCarb: false,
-    vegan: false,
-    glutenFree: false,
-    keto: false,
   });
 
   useEffect(() => {
@@ -48,36 +42,37 @@ function Recipes() {
     params.append('addRecipeInformation', 'true');
     params.append('apiKey', import.meta.env.VITE_SPOONACULAR_KEY);
 
+    // Add diet filters
     const dietFilters = [];
-    if (filters.vegan) dietFilters.push('vegan');
-    if (filters.glutenFree) dietFilters.push('gluten free');
-    if (filters.keto) dietFilters.push('ketogenic');
+    if (filters.lowFat) dietFilters.push('low fat');
+    if (filters.lowCalorie) dietFilters.push('low calorie');
     
     if (dietFilters.length > 0) {
       params.append('diet', dietFilters.join(','));
     }
 
-    if (filters.highCarb && !filters.lowCarb) {
-      params.append('minCarbs', '45');
-    }
-        if (filters.highProtein) {
+    // Add nutrition filters
+    if (filters.highProtein) {
       params.append('minProtein', '20');
     }
     if (filters.lowCarb) {
-      params.append('maxCarbs', '30');
+      params.append('maxCarbs', '50');
     }
-    if (filters.lowCalorie) {
-      params.append('maxCalories', '300');
-    }
-    if (filters.lowFat) {
-      params.append('maxFat', '5');
+    if (filters.highCarb && !filters.lowCarb) {
+      params.append('minCarbs', '50');
     }
 
+    // Add ingredient filter - will use pantry ingredients when implemented
     if (filters.haveAllIngredients) {
-      // TODO: Replace with actual pantry ingredients when pantry feature is implemented
-      // For now, using some common pantry staples as example
-      const pantryIngredients = ['salt', 'pepper', 'olive oil', 'garlic', 'onion'];
-      params.append('includeIngredients', pantryIngredients.join(','));
+      // Get pantry ingredients from localStorage
+      const savedPantry = localStorage.getItem('pantryItems');
+      if (savedPantry) {
+        const pantryItems = JSON.parse(savedPantry);
+        const pantryIngredients = pantryItems.map((item: any) => item.name);
+        if (pantryIngredients.length > 0) {
+          params.append('includeIngredients', pantryIngredients.join(','));
+        }
+      }
     }
 
     return params.toString();
@@ -113,6 +108,7 @@ function Recipes() {
     }));
   };
 
+  // Automatically search when filters change
   useEffect(() => {
     if (search.trim()) {
       fetchRecipes(search);
@@ -186,37 +182,17 @@ function Recipes() {
             />
             <span>Low Carb</span>
           </label>
-
-          <label className="filter-item">
-            <input
-              type="checkbox"
-              checked={filters.vegan}
-              onChange={() => handleFilterChange('vegan')}
-            />
-            <span>Vegan</span>
-          </label>
-
-          <label className="filter-item">
-            <input
-              type="checkbox"
-              checked={filters.glutenFree}
-              onChange={() => handleFilterChange('glutenFree')}
-            />
-            <span>Gluten Free</span>
-          </label>
-
-          <label className="filter-item">
-            <input
-              type="checkbox"
-              checked={filters.keto}
-              onChange={() => handleFilterChange('keto')}
-            />
-            <span>Keto</span>
-          </label>
         </div>
       </div>
 
       {loading && <p>Loading recipes...</p>}
+
+      {filters.haveAllIngredients && recipes.length === 0 && !loading && (
+        <div className="no-recipes-message">
+          <p>No recipes found that can be made with your current pantry ingredients.</p>
+          <p>Try adding more ingredients to your pantry or uncheck "Have all ingredients" to see more recipes.</p>
+        </div>
+      )}
 
       <div className="recipe-list">
         {recipes.map((recipe) => (

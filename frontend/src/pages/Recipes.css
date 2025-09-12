@@ -7,7 +7,7 @@
 }
 
 .search-bar input {
-  color: #000;
+  color: #2C2B2B;
   padding: 0.75rem 1rem;
   font-size: 1rem;
   border: 2px solid #ddd;
@@ -33,6 +33,10 @@
   border-radius: 25px;
   cursor: pointer;
   transition: background-color 0.2s ease;
+}
+
+.search-bar button:hover {
+  background-color: #ffb800;
 }
 
 .filter-container {
@@ -85,19 +89,33 @@
   transition: color 0.2s ease;
 }
 
-.search-bar button:hover {
-  background-color: #ffb800;
+.no-recipes-message {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f8f9fa;
+  border-radius: 12px;
+  margin: 2rem 0;
+  border: 2px solid #e9ecef;
+}
+
+.no-recipes-message p {
+  margin: 0.5rem 0;
+  color: #666;
+}
+
+.no-recipes-message p:first-child {
+  font-weight: 600;
+  color: #333;
 }
 
 .recipe-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
-  margin-right: 20px;
 }
 
 .recipe-card {
-  color:#2C2B2B;
+  color: #2C2B2B;
   background: #F5F2F2;
   padding: 1.25rem;
   border-radius: 12px;
@@ -114,7 +132,7 @@
   margin-bottom: 1rem;
 }
 
-.view-btn {
+.recipe-btn {
   margin-top: auto;
   padding: 0.5rem 1.25rem;
   background: #ffcc00;
@@ -128,4 +146,16 @@
 
 .recipe-btn:hover {
   background: #ffb800;
+}
+
+.view-btn {
+  margin-top: auto;
+  padding: 0.5rem 1.25rem;
+  background: #ffcc00;
+  color: #000;
+  font-weight: bold;
+  border-radius: 20px;
+  text-decoration: none;
+  text-align: center;
+  transition: background 0.2s ease;
 }
